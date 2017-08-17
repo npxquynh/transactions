@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.ow2.asm:asm-analysis:5.0.3:jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib_managed/jars/org.ow2.asm/asm-analysis/asm-analysis-5.0.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib_managed/srcs/org.ow2.asm/asm-analysis/asm-analysis-5.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: io.netty:netty-handler:4.0.47.Final:jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib_managed/jars/io.netty/netty-handler/netty-handler-4.0.47.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib_managed/srcs/io.netty/netty-handler/netty-handler-4.0.47.Final-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
