@@ -16,6 +16,4 @@ object Dependencies {
   
   implicit val conf: Config = ConfigFactory.parseFile(new File(s"src/main/resources/application.conf"))
   
-  val executeQueries: Boolean = false
-  
 }

@@ -14,7 +14,10 @@ trait InstanceDescription extends Description {
     case list: Iterable[Any] =>
       list.par.map(item => InstanceDescriptionImpl(item, item.getClass)).toList
     case opt: Option[_] =>
-      Nil
+      opt match {
+        case Some(inst) => List(InstanceDescriptionImpl(inst, inst.getClass))
+        case None => Nil
+      }
     case Some(inst) =>
       List(InstanceDescriptionImpl(inst, inst.getClass))
     case _ =>

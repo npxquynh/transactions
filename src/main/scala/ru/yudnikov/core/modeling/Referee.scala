@@ -5,22 +5,28 @@ import java.util.UUID
 import ru.yudnikov.core.Commons
 
 import scala.concurrent.stm._
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 /**
   * Created by Don on 16.08.2017.
   */
-class Referee[T <: Model] {
+class Referee[T <: Model](implicit classTag: ClassTag[T]) {
   
   private val logger = Commons.logger(getClass)
   
   private val references: TMap[UUID, Set[Reference[Model]]] = TMap()
   
-  protected def include(id: UUID, reference: Reference[Model]): Try[Unit] = atomic { implicit txn =>
+  def include(id: UUID, references: Set[Reference[Model]]): Set[Try[Unit]] = atomic { implicit txn =>
+    references.map(include(id, _))
+  }
+  
+  def include(id: UUID, reference: Reference[Model]): Try[Unit] = atomic { implicit txn =>
     val currentReferences = references.snapshot
     currentReferences.getOrElse(id, Set()) match {
       case set: Set[Reference[Model]] if !set.contains(reference) => Success {
         Try {
+          1 / 0
           references.put(id, set + reference)
         }
         logger.trace(s"included reference $reference in $set")
@@ -30,7 +36,7 @@ class Referee[T <: Model] {
     }
   }
   
-  protected def exclude(id: UUID, reference: Reference[Model]): Try[Unit] = atomic { implicit txn =>
+  def exclude(id: UUID, reference: Reference[Model]): Try[Unit] = atomic { implicit txn =>
     val currentReferences = references.snapshot
     currentReferences.getOrElse(id, Set()) match {
       case set: Set[Reference[Model]] if set.contains(reference) => Success {
@@ -41,7 +47,7 @@ class Referee[T <: Model] {
     }
   }
   
-  protected def get(id: UUID): Option[Set[Reference[Model]]] = atomic { implicit txn =>
+  def get(id: UUID): Option[Set[Reference[Model]]] = atomic { implicit txn =>
     references.get(id)
   }
   

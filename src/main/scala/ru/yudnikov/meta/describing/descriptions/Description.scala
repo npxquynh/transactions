@@ -23,11 +23,10 @@ trait Description {
   lazy val isReference: Boolean = classOf[Reference[Model]].isAssignableFrom(aClass)
   lazy val isCollection: Boolean = classOf[GenIterable[_]].isAssignableFrom(aClass)
   lazy val isReferenceCollection: Boolean = classOf[GenIterable[Reference[Model]]].isAssignableFrom(aClass)
-  
   lazy val isOption: Boolean = classOf[Option[_]].isAssignableFrom(aClass)
   
-  def filter(p: Description => Boolean): Set[Description] =
-    if (p(this)) Set(this) else Set[Description]() union {
+def filter[T <: Description](p: T => Boolean): Set[T] =
+    if (p(this.asInstanceOf[T])) Set(this.asInstanceOf[T]) else Set[T]() union {
       children.flatMap {
         _.filter(p)
       }.toSet

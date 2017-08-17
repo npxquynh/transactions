@@ -5,7 +5,11 @@ import java.util.UUID
 import com.typesafe.scalalogging.Logger
 import ru.yudnikov.core._
 import ru.yudnikov.core.storing.StorableManager
+import ru.yudnikov.meta.describing.descriptions.InstanceDescription
 
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 import scala.concurrent.stm._
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
@@ -25,17 +29,37 @@ abstract class Manager[+T <: Model](implicit classTag: ClassTag[T]) extends Stor
   
   private[this] val keeper = new Keeper[T]
   
+  private[this] val forwardReferee = new Referee[T]
+  
+  private[this] val backwardReferee = new Referee[T]
+  
   def update(model: Model): Reference[_ <: Model] = {
     logger.trace(s"updating $model")
     atomic { implicit txn =>
       val count = counter.count()
-      keeper.keep(model, count) match {
-        case Success(_) =>
-          logger.trace(s"model kept, creating reference with count $count")
-          Reference(aClass, model.id, count)
-        case Failure(exception) =>
-          throw exception
+      val keepFuture = Future {
+        keeper.keep(model, count)
       }
+      val includeRefsFuture = Future {
+        val refs = model._description.filter[InstanceDescription](_.isReference).map(_.instance.asInstanceOf[Reference[Model]])
+        if (refs.nonEmpty) {
+          logger.trace(s"including $refs")
+          forwardReferee.include(model.id, refs).filter(_.isFailure) match {
+            case set: Set[Try[Unit]] if set.isEmpty =>
+              Success()
+            case fails: Set[Try[Unit]] =>
+              throw new Exception(s"can't include refs: ${fails.map(_.asInstanceOf[Failure[Unit]].exception)}")
+          }
+        } else {
+          Success()
+        }
+      }
+      val resultFuture = for {
+        a <- keepFuture
+        b <- includeRefsFuture
+      } yield
+        Reference(aClass, model.id, count)
+      Await.result(resultFuture, Duration.Inf)
     }
   }
   

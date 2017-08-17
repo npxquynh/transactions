@@ -10,7 +10,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
-import ru.yudnikov.Dependencies
+import ru.yudnikov.{Dependencies, Settings}
 import ru.yudnikov.core.modeling.{Model, Reference}
 import ru.yudnikov.core.storing.storages.cassandra.Cassandra.getClass
 import ru.yudnikov.core.storing.storages.cassandra.codecs.{BigDecimalCodec, JodaCodec, ReferenceCodec, ReferenceListCodec}
@@ -33,6 +33,7 @@ trait CassandraStorage extends Storage {
   private val logger = Logger(LoggerFactory.getLogger(getClass.getSimpleName))
   
   implicit class ScalableFuture[T](listenableFuture: ListenableFuture[T]) {
+    
     def asScala: Future[T] = {
       val promise = Promise[T]()
       val callback = new FutureCallback[T] {
@@ -71,6 +72,7 @@ trait CassandraStorage extends Storage {
   lazy private val port: Int = conf.getInt("cassandra.port")
   
   lazy val cluster: Cluster = Cluster.builder().addContactPoint(host).withPort(port).build()
+  
   cluster.getConfiguration.getCodecRegistry.register(new ReferenceCodec)
   cluster.getConfiguration.getCodecRegistry.register(new ReferenceListCodec)
   cluster.getConfiguration.getCodecRegistry.register(new BigDecimalCodec)
@@ -80,7 +82,7 @@ trait CassandraStorage extends Storage {
   lazy protected val session: Session = cluster.connect()
   
   protected def executeFutureUnit(query: String): Future[Try[Unit]] = {
-    if (Dependencies.executeQueries) executeFuture(query) map {
+    if (Settings.executeQueries) executeFuture(query) map {
       case Success(_) =>
         Success()
       case Failure(exception) =>

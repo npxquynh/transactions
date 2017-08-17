@@ -19,11 +19,11 @@ object MyApp extends App {
   
   def body = {
     //atomic { implicit txn =>
-    val oleg = new Person("Oleg", None)
-    val oleg2 = new Person("Oleg2", None, oleg.id)
+    val oleg = new Person("Oleg", None, None)
+    val oleg2 = new Person("Oleg2", None, Some(oleg.reference), oleg.id)
     /*println(oleg)
     println(oleg.reference)*/
-    val igor = new Person("Igor", Some(oleg.reference))
+    val igor = new Person("Igor", Some(oleg.reference), Some(oleg2.reference))
     //println(igor.reference.model)
     /*println(igor)
     println(igor.reference)
@@ -33,7 +33,7 @@ object MyApp extends App {
     
   }
   
-  Commons.repeat(body, 30)
+  Commons.repeat(body, 1)
   
   Thread.sleep(1000)
   

@@ -9,7 +9,8 @@ import ru.yudnikov.core.modeling.{Manager, Model, Reference}
   */
 case class Person(
                    name: String,
-                   parent: Option[Reference[Person]],
+                   mother: Option[Reference[Person]],
+                   father: Option[Reference[Person]],
                    id: UUID = UUID.randomUUID()
                  ) extends Model(Person)
 
