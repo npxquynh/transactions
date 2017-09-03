@@ -19,11 +19,15 @@ case class ColumnInstanced[T](
                                instance: T,
                                children: List[ColumnInstanced[T]] = Nil
                              ) extends AbstractColumn[T] {
-  
+
   val value: String = {
     //logger.trace(s"codec is $codec, value ${description.instance}")
     try {
-      codec.format(instance)
+      instance match {
+        case Some(x) => codec.format(x.asInstanceOf[T])
+        case x: Any => codec.format(x.asInstanceOf[T])
+      }
+
     } catch {
       case e: Exception =>
         if (maybeClass.isEmpty) {
@@ -33,15 +37,21 @@ case class ColumnInstanced[T](
         }
     }
   }
-  
+
 }
 
 object ColumnInstanced {
-  
+
   def instantiate[T](column: Column[T], inst: T): ColumnInstanced[T] = {
-    val result = ColumnInstanced(column.name, column.maybeClass, column.dataType, column.codec, column.isNative,
-      column.isPrimaryKey, column.isIndex, inst)
-    
+    val result = try {
+      ColumnInstanced(column.name, column.maybeClass, column.dataType, column.codec, column.isNative,
+        column.isPrimaryKey, column.isIndex, inst)
+    }
+    catch {
+      case e: Exception =>
+        throw e
+    }
+
     val children: List[ColumnInstanced[T]] =
       if (column.name == "date" && column.maybeClass.contains(classOf[DateTime])) {
         AbstractColumn.dateExpansion.map { t =>
@@ -50,13 +60,13 @@ object ColumnInstanced {
       } else {
         Nil
       }
-    
+
     result.copy(children = children)
-    
+
   }
-  
+
   def apply[T](column: Column[T], instance: T): ColumnInstanced[T] = instantiate(column, instance)
-  
+
   def apply[T](description: InstancePropertyDescription): ColumnInstanced[T] = {
     instantiate[T](Column(description), description.instance.asInstanceOf[T])
   }

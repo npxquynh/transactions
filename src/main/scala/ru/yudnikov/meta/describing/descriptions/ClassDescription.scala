@@ -1,6 +1,6 @@
 package ru.yudnikov.meta.describing.descriptions
 
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 import ru.yudnikov.meta.describing.classes.ClassDescriptionImpl
 
 import scala.reflect.runtime.universe._
@@ -15,7 +15,7 @@ trait ClassDescription extends Description {
   val children: List[Description] = aType.typeArgs match {
     case List(t) =>
       try
-        List(ClassDescriptionImpl(t, Reflection.classByType(t)))
+        List(ClassDescriptionImpl(t, Reflector.classByType(t)))
       catch {
         case _: ClassNotFoundException if t.typeSymbol.fullName == "scala.Any" =>
           Nil

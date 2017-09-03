@@ -1,6 +1,6 @@
 package ru.yudnikov.meta.describing.descriptions
 
-import ru.yudnikov.meta.describing.Serialization
+import ru.yudnikov.meta.describing.Serializer
 import ru.yudnikov.meta.describing.instances.InstanceDescriptionImpl
 
 /**
@@ -15,8 +15,10 @@ trait InstanceDescription extends Description {
       list.par.map(item => InstanceDescriptionImpl(item, item.getClass)).toList
     case opt: Option[_] =>
       opt match {
-        case Some(inst) => List(InstanceDescriptionImpl(inst, inst.getClass))
-        case None => Nil
+        case Some(i) =>
+          List(InstanceDescriptionImpl(i, i.getClass))
+        case None =>
+          Nil
       }
     case Some(inst) =>
       List(InstanceDescriptionImpl(inst, inst.getClass))
@@ -34,6 +36,6 @@ trait InstanceDescription extends Description {
     case _ => false
   }
   
-  override def toString: String = if (children.isEmpty) Serialization.serialize(instance) else super.toString
+  override def toString: String = if (children.isEmpty) Serializer.serialize(instance) else super.toString
   
 }

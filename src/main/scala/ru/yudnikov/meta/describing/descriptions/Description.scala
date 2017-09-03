@@ -5,7 +5,7 @@ import java.util.UUID
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 import ru.yudnikov.core.modeling.{Model, Reference}
-import ru.yudnikov.meta.describing.Serialization
+import ru.yudnikov.meta.describing.Serializer
 
 import scala.collection.GenIterable
 
@@ -40,7 +40,7 @@ def filter[T <: Description](p: T => Boolean): Set[T] =
   }
   
   override def toString: String =
-    Serialization.classAliases.getOrElse(aClass, aClass).getName + {
+    Serializer.classAliases.getOrElse(aClass, aClass).getName + {
       if (children.nonEmpty)
         s"(${
           children.map {

@@ -11,6 +11,7 @@ case class Person(
                    name: String,
                    mother: Option[Reference[Person]],
                    father: Option[Reference[Person]],
+                   age: Long = 12L,
                    id: UUID = UUID.randomUUID()
                  ) extends Model(Person)
 

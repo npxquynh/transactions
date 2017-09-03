@@ -10,8 +10,10 @@ import scala.util.Try
 trait Storage {
   
   def save(storable: Storable[_]): Future[Try[Unit]]
+
+  def save(storables: List[Storable[_]]): Future[Try[Unit]]
   
-  def list: Future[List[Storable[_]]]
+  def list[K, T <: Storable[K]](aClass: Class[T]): Future[List[T]]
   
   def load[K, T <: Storable[K]](aClass: Class[T], id: K): Future[Try[T]]
   

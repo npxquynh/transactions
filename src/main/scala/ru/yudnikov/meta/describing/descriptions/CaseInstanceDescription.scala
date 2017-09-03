@@ -1,6 +1,6 @@
 package ru.yudnikov.meta.describing.descriptions
 
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 import ru.yudnikov.meta.describing.instances.{CaseInstancePropertyDescription, InstancePropertyDescription}
 
 /**
@@ -9,9 +9,9 @@ import ru.yudnikov.meta.describing.instances.{CaseInstancePropertyDescription, I
 trait CaseInstanceDescription extends InstanceDescription {
   
   override val children: List[InstanceDescription with PropertyDescription] = {
-    val args = Reflection.unapplyCaseInstance(instance).map(arg => arg._1 -> (Reflection.classByType(arg._2._1) -> arg._2._2))
+    val args = Reflector.unapplyCaseInstance(instance).map(arg => arg._1 -> (Reflector.classByType(arg._2._1) -> arg._2._2))
     args.map {
-      case (name, (cls, inst)) if Reflection.isCaseClass(cls) => InstancePropertyDescription(name, cls, inst, this)
+      case (name, (cls, inst)) if Reflector.isCaseClass(cls) => InstancePropertyDescription(name, cls, inst, this)
       case (name, (cls, inst)) => InstancePropertyDescription(name, cls, inst, this)
     }.toList
   }

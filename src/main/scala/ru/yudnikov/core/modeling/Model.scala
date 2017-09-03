@@ -10,13 +10,17 @@ import ru.yudnikov.core.storing.Storable
 abstract class Model(val manager: Manager[Model]) extends Storable[UUID] {
   
   val id: UUID
-  
+
   private val _reference: Reference[_ <: Model] = {
     manager.update(this)
   }
   
   def reference[T <: Model]: Reference[T] = _reference.asInstanceOf[Reference[T]]
-  
-  val version: Long = reference.count
-  
+
+}
+
+object Model {
+
+  implicit def toStorable(model: Model): Storable[UUID] = model.asInstanceOf[Storable[UUID]]
+
 }

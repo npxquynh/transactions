@@ -16,7 +16,7 @@ import ru.yudnikov.core.storing.storages.cassandra.Cassandra.getClass
 import ru.yudnikov.core.storing.storages.cassandra.codecs.{BigDecimalCodec, JodaCodec, ReferenceCodec, ReferenceListCodec}
 import ru.yudnikov.core.storing.storages.cassandra.column.{Column, ColumnInstanced}
 import ru.yudnikov.core.storing.{Storable, Storage}
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 import ru.yudnikov.meta.describing.classes.{ClassDescriptionImpl, StorableClassDescription}
 import ru.yudnikov.meta.describing.descriptions.{InstanceDescription, PropertyDescription}
 import ru.yudnikov.meta.describing.instances.{InstancePropertyDescription, StorableInstanceDescription}
@@ -93,7 +93,7 @@ trait CassandraStorage extends Storage {
   
   protected def executeFuture(query: String): Future[Try[ResultSet]] = {
     try {
-      logger.debug(s"executing query: \n$query")
+      logger.info(s"executing query: \n$query")
       session.executeAsync(session.prepare(query).bind()).asScala map (resultSet => Success(resultSet))
     } catch {
       case e: Exception =>
@@ -134,13 +134,21 @@ trait CassandraStorage extends Storage {
   
   protected def columns[T](description: StorableClassDescription[_]): List[column.Column[T]] = {
     description.children.map {
-      d: PropertyDescription => column.Column[T](d)
+      d: PropertyDescription => Column[T](d)
     }
   }
   
   protected def columnsInstanced[T](description: InstanceDescription): List[column.ColumnInstanced[T]] = {
     description.children.map {
-      case d: InstancePropertyDescription => column.ColumnInstanced[T](d)
+      case d: InstancePropertyDescription =>
+        logger.trace(s"description to column $d")
+        try {
+          ColumnInstanced[T](d)
+        } catch {
+          case e: Exception =>
+            e.printStackTrace()
+            throw e
+        }
     }
   }
 }

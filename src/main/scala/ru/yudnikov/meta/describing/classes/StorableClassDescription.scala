@@ -1,7 +1,7 @@
 package ru.yudnikov.meta.describing.classes
 
 import ru.yudnikov.core.storing.Storable
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 import ru.yudnikov.meta.describing.descriptions.{CaseClassDescription, StorableDescription}
 
 

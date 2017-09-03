@@ -1,7 +1,7 @@
 package ru.yudnikov.meta.describing.classes
 
 import ru.yudnikov.meta.describing.descriptions.{ClassDescription, Description, PropertyDescription}
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 
 import scala.reflect.runtime.universe._
 
@@ -14,5 +14,5 @@ case class ClassPropertyDescription(
                                      aType: Type
                                    ) extends PropertyDescription with ClassDescription {
   
-  override val aClass: Class[_] = Reflection.classByType(aType)
+  override val aClass: Class[_] = Reflector.classByType(aType)
 }

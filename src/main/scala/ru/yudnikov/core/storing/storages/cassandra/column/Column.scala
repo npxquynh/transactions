@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import ru.yudnikov.core.modeling.Model
 
 import ru.yudnikov.core.storing.storages.cassandra.Cassandra
-import ru.yudnikov.meta.describing.Reflection
+import ru.yudnikov.meta.describing.Reflector
 import ru.yudnikov.meta.describing.descriptions.PropertyDescription
 
 /**
@@ -47,9 +47,9 @@ object Column {
         Some(description.aClass.asInstanceOf[Class[T]])
       } else if (description.isOption && description.children.nonEmpty) {
         Some(description.children.head.aClass.asInstanceOf[Class[T]])
-      } else if (Reflection.scalaToJava.get(description.aClass).nonEmpty
-        && Cassandra.dataTypesNative.get(Reflection.scalaToJava(description.aClass)).nonEmpty) {
-        Some(Reflection.scalaToJava(description.aClass).asInstanceOf[Class[T]])
+      } else if (Reflector.scalaToJava.get(description.aClass).nonEmpty
+        && Cassandra.dataTypesNative.get(Reflector.scalaToJava(description.aClass)).nonEmpty) {
+        Some(Reflector.scalaToJava(description.aClass).asInstanceOf[Class[T]])
       } else {
         None
       }
